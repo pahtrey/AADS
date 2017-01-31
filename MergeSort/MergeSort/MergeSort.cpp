@@ -6,9 +6,12 @@
 
 using namespace std;
 
-void Distr(fstream& FileA, fstream& FileB, fstream& FileC, int seriesLength)
+void Distr(fstream& FileA, fstream& FileB, fstream& FileC, int seriesLength, int countIntegerInFile)
 {
 	int number;
+	int countB = 0;
+	int countC = 0;
+	int i, j;
 
 	if (!FileA.eof())
 	{
@@ -16,16 +19,30 @@ void Distr(fstream& FileA, fstream& FileB, fstream& FileC, int seriesLength)
 	}
 
 	while (!FileA.eof())
-	{
-		for (int i = 0; i < seriesLength; ++i)
+	{ 
+		for (i = 0; i < seriesLength && !FileA.eof(); ++i)
 		{
 			FileB << number << " ";
+			++countB;
 			FileA >> number;
 		}
-		for (int j = 0; j < seriesLength; ++j)
+		for (j = 0; j < seriesLength && !FileA.eof(); ++j)
 		{
 			FileC << number << " ";
+			++countC;
 			FileA >> number;
+		}
+	}
+
+	if (countB + countC < countIntegerInFile)
+	{
+		if (countB == countC)
+		{
+			FileB << number << " ";
+		}
+		else
+		{
+			FileC << number << " ";
 		}
 	}
 }
@@ -48,7 +65,7 @@ void Merge(fstream &FileA, fstream &FileB, fstream &FileC, int seriesLength)
 	{
 		int i = 0;
 		int j = 0;
-		while (i < seriesLength && j < seriesLength)
+		while (i < seriesLength && j < seriesLength && !FileB.eof() && !FileC.eof())
 		{
 			if (number1 < number2)
 			{
@@ -121,7 +138,7 @@ void MergeSort(string &input)
 		FileB.open(FileNameB, std::ios::out);
 		FileC.open(FileNameC, std::ios::out);
 
-		Distr(FileA, FileB, FileC, i);
+		Distr(FileA, FileB, FileC, i, countIntegerInFile);
 
 		FileA.close();
 		FileB.close();
@@ -139,8 +156,8 @@ void MergeSort(string &input)
 
 		i *= 2;
 	}
-	remove(FileNameB.c_str());
-	remove(FileNameC.c_str());
+	//remove(FileNameB.c_str());
+	//remove(FileNameC.c_str());
 }
 
 void PrintFileElements(string &input)
